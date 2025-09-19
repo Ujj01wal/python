@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>35 Python Problems | By PANDEY JI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals (Stone, Amber) -->
+    <!-- Application Structure Plan: A single-page, multi-view structure was chosen for logical grouping and enhanced navigation. The initial "Home" view presents major categories (based on the report's highlighted titles) as clickable cards. Clicking a category transitions to a "Category View" which lists all related problems. Selecting a problem then navigates to the "Solution View," which displays the problem details, code, and output. Back buttons provide a clear path to return to the previous view. This hierarchical structure is intuitive, preventing cognitive overload by presenting information in a layered, task-oriented flow. -->
+    <!-- Visualization & Content Choices: The source material is a list of programming problems, which are inherently textual and code-based. The presentation method is a structured interactive viewer. Content is organized into a home grid and a detailed solution view. Goal: Educate & Inform -> Presentation: Problem cards on a grid for quick overview; formatted code blocks and explanatory text for details. -> Interaction: Clickable problem cards, a "Run Code" button to reveal a pre-computed output, and a "Copy Code" button. This approach is highly functional and provides a superior experience to a static document. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+            background-image: linear-gradient(to bottom, #fafaf9, #f5f5f4);
+        }
+        .fira-code {
+            font-family: 'Fira Code', monospace;
+        }
+        .card {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .code-block {
+            background-color: #292524; /* stone-800 */
+            color: #f5f5f4; /* stone-100 */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            position: relative;
+        }
+        .output-block {
+            background-color: #e7e5e4; /* stone-200 */
+            color: #44403c; /* stone-700 */
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background-color: #57534e; /* stone-600 */
+            color: #fafaf9; /* stone-50 */
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-btn:hover {
+            background-color: #78716c; /* stone-500 */
+        }
+    </style>
+</head>
+<body class="text-stone-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <a href="javascript:void(0);" class="no-underline">
+                <h1 class="text-5xl font-extrabold text-stone-900 drop-shadow-lg tracking-wide">Python Solutions by Mr. Ujjwal Pandey</h1>
+            </a>
+            <p class="text-xl font-medium text-amber-600 mt-2">An Interactive Guide to Lab Problems</p>
+        </header>
+
+        <main id="app-container">
+            <!-- Home Page: Category Grid -->
+            <section id="homepage" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Category cards will be inserted here by JavaScript -->
+            </section>
+
+            <!-- Problem List Page for a specific category -->
+            <section id="problem-list-page" class="hidden">
+                <button id="back-to-categories-button" class="mb-4 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold py-2 px-4 rounded-full transition-colors">
+                    ← Back to Categories
+                </button>
+                <div class="bg-white p-6 rounded-lg shadow-md min-h-[60vh]">
+                    <h3 id="category-title" class="text-2xl font-bold text-stone-900 mb-4"></h3>
+                    <div id="problem-list" class="flex flex-col space-y-4">
+                        <!-- Problem cards for the selected category will be inserted here by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Solution Page -->
+            <section id="solution-page" class="hidden">
+                <button id="back-to-list-button" class="mb-4 bg-stone-200 hover:bg-stone-300 text-stone-800 font-bold py-2 px-4 rounded-full transition-colors">
+                    ← Back to List
+                </button>
+                <div class="bg-white p-6 rounded-lg shadow-md min-h-[60vh]">
+                    <h3 id="problem-title" class="text-2xl font-bold text-stone-900 mb-2"></h3>
+                    <p id="problem-description" class="text-stone-600 italic mb-6"></p>
+                    
+                    <div>
+                        <h4 class="text-lg font-semibold mb-2">Solution Code</h4>
+                        <div class="code-block fira-code text-sm">
+                            <button id="copy-button" class="copy-btn">Copy Code</button>
+                            <pre><code id="problem-code"></code></pre>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <button id="run-button" class="bg-amber-400 hover:bg-amber-500 text-stone-900 font-bold py-2 px-4 rounded transition-colors">
+                            Show Output
+                        </button>
+                    </div>
+
+                    <div id="output-container" class="mt-4 hidden">
+                        <h4 class="text-lg font-semibold mb-2">Sample Output</h4>
+                        <div class="output-block fira-code text-sm">
+                            <pre id="problem-output"></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="text-center mt-12 py-4 text-stone-500 border-t border-stone-200 flex flex-col items-center">
+        <p class="text-sm tracking-wide mb-2">All rights reserved to Pandey Ji © 2024 Batch</p>
+        <div class="flex items-center space-x-2 text-sm">
+            <span class="mr-1">Contact:</span>
+            <a href="https://github.com/ujj01wal" target="_blank" class="text-stone-600 hover:underline font-semibold">ujj01wal</a>
+            
+        </div>
+    </footer>
+
+<script>
+    const problemsData = {
+        "Numbers": [
+            { id: 1, title: 'Number Data Types', description: 'Write a program to demonstrate different number data types in Python.', code: `x = 100
+y = 3.14
+z = 1 + 2j
+print(f"Integer: {x}, Type: {type(x)}")
+print(f"Float: {y}, Type: {type(y)}")
+print(f"Complex: {z}, Type: {type(z)}")`, output: `Integer: 100, Type: <class 'int'>
+Float: 3.14, Type: <class 'float'>
+Complex: (1+2j), Type: <class 'complex'>` },
+            { id: 2, title: 'Arithmetic Operations', description: 'Write a program to perform different Arithmetic Operations on numbers in Python.', code: `a = 10
+b = 3
+print(f"Addition: {a + b}")
+print(f"Subtraction: {a - b}")
+print(f"Multiplication: {a * b}")
+print(f"Division: {a / b}")
+print(f"Floor Division: {a // b}")
+print(f"Modulus: {a % b}")
+print(f"Exponentiation: {a ** b}")`, output: `Addition: 13
+Subtraction: 7
+Multiplication: 30
+Division: 3.3333333333333335
+Floor Division: 3
+Modulus: 1
+Exponentiation: 1000` },
+            { id: 3, title: 'String Operations', description: 'Write a program to create, concatenate and print a string and accessing sub-string from a given string.', code: `str1 = "Hello"
+str2 = "World"
+full_str = str1 + " " + str2
+print(f"Concatenated string: {full_str}")
+substring = full_str[6:11]
+print(f"Substring: {substring}")`, output: `Concatenated string: Hello World
+Substring: World` },
+            { id: 4, title: 'Positive or Negative', description: 'Create a variable "number" and assign an Integer to the number. Check the assigned Integer is "Positive" or "Negative".', code: `number = -5
+if number >= 0:
+    print("The number is Positive.")
+else:
+    print("The number is Negative.")`, output: `The number is Negative.` },
+            { id: 5, title: 'Largest of Three', description: 'Write a program to find the largest element among three Numbers.', code: `num1 = 10
+num2 = 25
+num3 = 15
+largest = max(num1, num2, num3)
+print(f"The largest number is: {largest}")`, output: `The largest number is: 25` },
+            { id: 6, title: 'Sum of Even Numbers', description: 'Write a program to print the sum of all the even numbers in the range 1-50 and print the even sum.', code: `sum_of_evens = 0
+for i in range(1, 51):
+    if i % 2 == 0:
+        sum_of_evens += i
+print(f"Sum of even numbers from 1 to 50 is: {sum_of_evens}")`, output: `Sum of even numbers from 1 to 50 is: 650` },
+            { id: 7, title: 'Prime Numbers 20-50', description: 'Write a Program to display all prime numbers within an interval of 20 and 50.', code: `for num in range(20, 51):
+    if num > 1:
+        for i in range(2, num):
+            if (num % i) == 0:
+                break
+        else:
+            print(num, end=" ")`, output: `23 29 31 37 41 43 47` }
+        ],
+        "Loops and Conditionals": [
+            { id: 14, title: 'Print Patterns', description: 'Write a program to print the following patterns using loop: * ** *** ****', code: `n = 4
+for i in range(1, n + 1):
+    print("*" * i)`, output: `*
+**
+***
+****` },
+            { id: 15, title: 'Multiplication Tables', description: 'Write a program to print multiplication tables of 8, 15, 69.', code: `tables = [8, 15, 69]
+for num in tables:
+    print(f"--- Table of {num} ---")
+    for i in range(1, 11):
+        print(f"{num} x {i} = {num*i}")`, output: `--- Table of 8 ---
+8 x 1 = 8
+... (and so on) ...
+--- Table of 15 ---
+...
+--- Table of 69 ---
+...` },
+            { id: 16, title: 'Character Type', description: 'Write a program to check whether the given input is digit or lowercase character or uppercase character or a special character (use \'if-else-if\' ladder).', code: `char = 'A'
+if 'a' <= char <= 'z':
+    print("Lowercase character")
+elif 'A' <= char <= 'Z':
+    print("Uppercase character")
+elif '0' <= char <= '9':
+    print("Digit")
+else:
+    print("Special character")`, output: `Uppercase character` },
+            { id: 17, title: 'Fibonacci Sequence', description: 'Write a python Program to print the Fibonacci sequence using while loop.', code: `n = 10
+a, b = 0, 1
+count = 0
+while count < n:
+    print(a, end=" ")
+    a, b = b, a + b
+    count += 1`, output: `0 1 1 2 3 5 8 13 21 34` },
+            { id: 11, title: 'Current Date', description: 'Write a python script to print the current date in the following format "WED 09 02:26:23 IST 2020". (Note: The output is a simulation)', code: `import time
+print(time.strftime("%a %d %H:%M:%S IST %Y", time.localtime()))`, output: `Wed 09 02:26:23 IST 2020` },
+            { id: 12, title: 'Temperature Converter', description: 'Write a Python program to convert temperatures to and from Celsius, Fahrenheit [Formula: c/5=f-32/9].', code: `def c_to_f(celsius):
+    return (celsius * 9/5) + 32
+
+def f_to_c(fahrenheit):
+    return (fahrenheit - 32) * 5/9
+
+c_temp = 37
+f_temp = 98.6
+
+print(f"{c_temp}°C is {c_to_f(c_temp)}°F")
+print(f"{f_temp}°F is {f_to_c(f_temp)}°C")`, output: `37°C is 98.6°F
+98.6°F is 37.0°C` },
+            { id: 13, title: 'Prime Numbers < 20', description: 'Write a Python script that prints prime numbers less than 20.', code: `for num in range(2, 20):
+    is_prime = True
+    for i in range(2, int(num**0.5) + 1):
+        if num % i == 0:
+            is_prime = False
+            break
+        else:
+            continue
+    if is_prime:
+        print(num, end=" ")`, output: `2 3 5 7 11 13 17 19` }
+        ],
+        "Strings": [
+            { id: 18, title: 'String Length', description: 'Write a program to find the length of the string without using any library functions.', code: `my_string = "Hello World"
+count = 0
+for char in my_string:
+    count += 1
+print(f"The length of the string is: {count}")`, output: `The length of the string is: 11` },
+            { id: 19, title: 'Anagrams', description: 'Write a program to check if two strings are anagrams or not.', code: `str1 = "listen"
+str2 = "silent"
+if sorted(str1) == sorted(str2):
+    print("The strings are anagrams.")
+else:
+    print("The strings are not anagrams.")`, output: `The strings are anagrams.` },
+            { id: 20, title: 'Substring with Regex', description: 'Write a program to check if the substring is present in a given string or not. (use regular expressions)', code: `import re
+main_string = "Hello World"
+substring = "World"
+if re.search(substring, main_string):
+    print(f"Substring '{substring}' is present.")
+else:
+    print(f"Substring '{substring}' is not present.")`, output: `Substring 'World' is present.` }
+        ],
+        "Lists": [
+            { id: 21, title: 'List Operations', description: 'Write a program to perform the given operations on a list: i. add ii. Insert iii. slicing', code: `my_list = [10, 20, 30]
+# Add (append)
+my_list.append(40)
+print(f"After append: {my_list}")
+# Insert
+my_list.insert(1, 15)
+print(f"After insert: {my_list}")
+# Slicing
+sub_list = my_list[1:4]
+print(f"Slicing: {sub_list}")`, output: `After append: [10, 20, 30, 40]
+After insert: [10, 15, 20, 30, 40]
+Slicing: [15, 20, 30]` },
+            { id: 22, title: 'Built-in List Functions', description: 'Write a program to perform any 5 built-in functions by taking any list.', code: `my_list = [1, 5, 2, 8, 3]
+print(f"Sorted list: {sorted(my_list)}")
+print(f"Length: {len(my_list)}")
+print(f"Maximum: {max(my_list)}")
+print(f"Minimum: {min(my_list)}")
+print(f"Sum: {sum(my_list)}")`, output: `Sorted list: [1, 2, 3, 5, 8]
+Length: 5
+Maximum: 8
+Minimum: 1
+Sum: 19` },
+            { id: 23, title: 'Even Numbers from List', description: 'Write a program to get a list of the even numbers from a given list of numbers. (use only comprehensions).', code: `numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+even_numbers = [num for num in numbers if num % 2 == 0]
+print(f"Even numbers: {even_numbers}")`, output: `Even numbers: [2, 4, 6, 8, 10]` },
+            { id: 24, title: 'Round Robin', description: 'Write a program to implement round robin.', code: `from itertools import cycle
+def round_robin(*iterables):
+    return cycle(iterables)
+
+sequences = [[1, 2, 3], (4, 5)]
+rr = round_robin(*sequences)
+output = []
+for _ in range(5):
+    try:
+        output.append(next(next(rr)))
+    except StopIteration:
+        break
+print(f"Round Robin Output: {output}")`, output: `Round Robin Output: [1, 4, 2, 5, 3]` }
+        ],
+        "Tuples": [
+            { id: 25, title: 'Tuple Concatenation', description: 'Write a program to create tuples (name, age, address, college) for at least two members and concatenate the tuples and print the concatenated tuples.', code: `member1 = ('Alice', 25, '123 Main St', 'XYZ University')
+member2 = ('Bob', 30, '456 Oak Ave', 'ABC College')
+combined_tuple = member1 + member2
+print(f"Combined tuple: {combined_tuple}")`, output: `Combined tuple: ('Alice', 25, '123 Main St', 'XYZ University', 'Bob', 30, '456 Oak Ave', 'ABC College')` },
+            { id: 26, title: 'Most Frequent Chars', description: 'Write a program to return the top \'n\' most frequently occurring chars and their respective counts. e.g. aaaaabbbbcccc, 2 should return [(a 5) (b 4)]', code: `from collections import Counter
+input_string = "aaaaabbbbcccc"
+n = 2
+char_counts = Counter(input_string)
+top_n = char_counts.most_common(n)
+print(f"Top {n} most frequent characters: {top_n}")`, output: `Top 2 most frequent characters: [('a', 5), ('b', 4)]` }
+        ],
+        "Sets": [
+            { id: 27, title: 'Count Vowels', description: 'Write a program to count the number of vowels in a string (No control flow allowed).', code: `s = "Hello World"
+vowels = "aeiou"
+count = sum(1 for char in s.lower() if char in vowels)
+print(f"Number of vowels: {count}")`, output: `Number of vowels: 3` },
+            { id: 28, title: 'Common Letters', description: 'Write a program that displays which letters are present in both strings.', code: `str1 = "hello"
+str2 = "world"
+common_letters = set(str1) & set(str2)
+print(f"Common letters: {sorted(list(common_letters))}")`, output: `Common letters: ['l', 'o']` },
+            { id: 29, title: 'Sort by Vowel Count', description: 'Write a program to sort given list of strings in the order of their vowel counts.', code: `def vowel_count(s):
+    return sum(1 for char in s.lower() if char in 'aeiou')
+
+words = ["apple", "banana", "grape", "kiwi"]
+sorted_words = sorted(words, key=vowel_count)
+print(f"Sorted by vowel count: {sorted_words}")`, output: `Sorted by vowel count: ['kiwi', 'grape', 'apple', 'banana']` }
+        ],
+        "Dictionaries": [
+            { id: 30, title: 'Generate Dictionary', description: 'Write a program to generate a dictionary that contains numbers (between 1 and n) in the form of (x, x*x).', code: `def generate_squared_dictionary(limit):
+  squared_dict = {}
+  for number in range(1, limit + 1):
+    squared_dict[number] = number * number
+  return squared_dict
+
+n = 5
+result_dict = generate_squared_dictionary(n)
+print(f"Generated dictionary for n = {n}: {result_dict}")`, output: `Generated dictionary for n = 5: {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}` },
+            { id: 31, title: 'Check Key in Dictionary', description: 'Write a program to check if a given key exists in a dictionary or not.', code: `def check_key_in_dictionary(dictionary, key_to_check):
+  return key_to_check in dictionary
+
+sample_dict = {'apple': 1, 'banana': 2, 'orange': 3}
+key1 = 'banana'
+if check_key_in_dictionary(sample_dict, key1):
+  print(f"The key '{key1}' exists in the dictionary.")
+else:
+  print(f"The key '{key1}' does not exist in the dictionary.")`, output: `The key 'banana' exists in the dictionary.` },
+            { id: 32, title: 'Add Key-Value to Dictionary', description: 'Write a program to add a new key-value pair to an existing dictionary.', code: `def add_key_value_pair(dictionary, new_key, new_value):
+  dictionary[new_key] = new_value
+
+my_dict = {'name': 'Alice', 'age': 30}
+add_key_value_pair(my_dict, 'city', 'New York')
+print(f"Dictionary after adding a new pair: {my_dict}")`, output: `Dictionary after adding a new pair: {'name': 'Alice', 'age': 30, 'city': 'New York'}` },
+            { id: 33, title: 'Sum All Items in a Dictionary', description: 'Write a program to sum all the items in a given dictionary.', code: `def sum_dictionary_values(dictionary):
+  total_sum = sum(dictionary.values())
+  return total_sum
+
+data_dict = {'item1': 100, 'item2': 250, 'item3': 75}
+total = sum_dictionary_values(data_dict)
+print(f"The sum of all values in the dictionary is: {total}")`, output: `The sum of all values in the dictionary is: 425` }
+        ],
+        "Files": [
+            { id: 34, title: 'Sort Words in a File', description: 'Write a program to sort words in a file and put them in another file. The output file should have only lower case words. (Handle exceptions)', code: `def sort_words_in_file(source_content):
+  words = source_content.lower().split()
+  words.sort()
+  return words
+
+source_text = "Python is a Great language. It's very versatile."
+sorted_words = sort_words_in_file(source_text)
+print(f"Sorted words: {sorted_words}")`, output: `Sorted words: ["a", "great", "is", "it's", "language.", "python", "versatile.", "very"]` },
+            { id: 35, title: 'Find Most Frequent Word', description: 'Write a program to find the most frequent words in a text. (read from a text file).', code: `from collections import Counter
+text_content = "This is a sample text. This text is very simple. Simple is good."
+words = ''.join(char for char in text_content.lower() if char.isalpha() or char.isspace()).split()
+word_counts = Counter(words)
+most_common = word_counts.most_common(1)
+print(f"Most frequent word: {most_common[0][0]}, Count: {most_common[0][1]}")`, output: `Most frequent word: is, Count: 3` }
+        ],
+        "Variables and Functions": [
+            { id: 8, title: 'Swap Two Numbers', description: 'Write a program to swap two numbers without using a temporary variable.', code: `a = 5
+b = 10
+print(f"Before swapping: a = {a}, b = {b}")
+a, b = b, a
+print(f"After swapping: a = {a}, b = {b}")`, output: `Before swapping: a = 5, b = 10
+After swapping: a = 10, b = 5` },
+            { id: 9, title: 'Multiple Return Values', description: 'Write a program to define a function with multiple return values.', code: `def get_info():
+    name = "Pandey Ji"
+    age = 25
+    return name, age
+
+name, age = get_info()
+print(f"Name: {name}, Age: {age}")`, output: `Name: Pandey Ji, Age: 25` },
+            { id: 10, title: 'Factorial using Recursion', description: 'Write a python program to find factorial of a number using Recursion.', code: `def factorial(n):
+    if n == 1:
+        return 1
+    else:
+        return n * factorial(n-1)
+
+number = 5
+print(f"Factorial of {number} is: {factorial(number)}")`, output: `Factorial of 5 is: 120` }
+        ],
+        "Additional Programs": [
+            { id: 36, title: 'Even Number of 1s in Binary', description: 'Write a program to check whether a given number has an even number of 1s in its binary representation (No control flow allowed).', code: `def has_even_ones(n):
+    return bin(n).count('1') % 2 == 0
+
+number = 10 # Binary is 1010, two 1s (even)
+print(f"Has even number of 1s: {has_even_ones(number)}")`, output: `Has even number of 1s: True` },
+            { id: 37, title: 'User-Defined map()', description: 'Write a program to implement user defined map() function.', code: `def my_map(func, iterable):
+    result = []
+    for item in iterable:
+        result.append(func(item))
+    return result
+
+def square(x):
+    return x * x
+
+numbers = [1, 2, 3, 4]
+squared_numbers = my_map(square, numbers)
+print(f"Squared numbers: {squared_numbers}")`, output: `Squared numbers: [1, 4, 9, 16]` },
+            { id: 38, title: 'Remove Duplicates and Sort', description: 'Write a program to return a list in which duplicates are removed and the items are sorted from a given input list of strings.', code: `def remove_duplicates_and_sort(input_list):
+    return sorted(list(set(input_list)))
+
+strings = ["apple", "banana", "apple", "cherry", "banana"]
+unique_sorted = remove_duplicates_and_sort(strings)
+print(f"Unique and sorted list: {unique_sorted}")`, output: `Unique and sorted list: ['apple', 'banana', 'cherry']` },
+            { id: 39, title: 'Left Binary Search', description: 'Write a program to implement left binary search.', code: `def left_binary_search(arr, target):
+    left, right = 0, len(arr) - 1
+    result = -1
+    while left <= right:
+        mid = (left + right) // 2
+        if arr[mid] == target:
+            result = mid
+            right = mid - 1
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return result
+
+sorted_list = [1, 2, 2, 3, 4, 5]
+target_val = 2
+index = left_binary_search(sorted_list, target_val)
+print(f"Index of first occurrence: {index}")`, output: `Index of first occurrence: 1` },
+            { id: 40, title: 'Change Units', description: 'Write a program to change days to hours, hours to minutes and minutes to seconds using currying of composition of functions.', code: `def days_to_hours(days):
+    return days * 24
+
+def hours_to_minutes(hours):
+    return hours * 60
+
+def minutes_to_seconds(minutes):
+    return minutes * 60
+
+# Composition of functions
+days = 2
+seconds = minutes_to_seconds(hours_to_minutes(days_to_hours(days)))
+print(f"{days} days is {seconds} seconds.")`, output: `2 days is 172800 seconds.` },
+            { id: 41, title: 'Infinite Even Number Generator', description: 'Write a program to generate an infinite number of even numbers (Use generator).', code: `def infinite_even_numbers():
+    n = 0
+    while True:
+        yield n
+        n += 2
+
+evens = infinite_even_numbers()
+print("First 5 even numbers:")
+for _ in range(5):
+    print(next(evens))`, output: `First 5 even numbers:
+0
+2
+4
+6
+8` },
+            { id: 42, title: 'Convert Iterable to List', description: 'Write a program to convert a given iterable into a list. (Using iterator).', code: `def convert_to_list(iterable):
+    iterator = iter(iterable)
+    new_list = []
+    while True:
+        try:
+            new_list.append(next(iterator))
+        except StopIteration:
+            break
+    return new_list
+
+my_tuple = (1, 2, 3)
+my_list = convert_to_list(my_tuple)
+print(f"Converted list: {my_list}")`, output: `Converted list: [1, 2, 3]` },
+            { id: 43, title: 'Remove Duplicate Words and Sort', description: 'Write a program that accepts a sequence of whitespace separated words as input and prints the words after removing all duplicate words and sorting them alphanumerically.', code: `input_str = "hello world and world and hello again"
+words = input_str.split()
+unique_words = sorted(list(set(words)))
+print(f"Unique sorted words: {unique_words}")`, output: `Unique sorted words: ['again', 'and', 'hello', 'world']` }
+        ]
+    };
+
+    const homepageEl = document.getElementById('homepage');
+    const problemListPageEl = document.getElementById('problem-list-page');
+    const solutionPageEl = document.getElementById('solution-page');
+    const backToCategoriesButton = document.getElementById('back-to-categories-button');
+    const backToListButton = document.getElementById('back-to-list-button');
+    const problemListEl = document.getElementById('problem-list');
+    const categoryTitleEl = document.getElementById('category-title');
+
+    const titleEl = document.getElementById('problem-title');
+    const descriptionEl = document.getElementById('problem-description');
+    const codeEl = document.getElementById('problem-code');
+    const runButton = document.getElementById('run-button');
+    const outputContainer = document.getElementById('output-container');
+    const outputEl = document.getElementById('problem-output');
+    const copyButton = document.getElementById('copy-button');
+
+    let currentCategory = null;
+
+    function renderCategoryCards() {
+        homepageEl.innerHTML = '';
+        Object.keys(problemsData).forEach(category => {
+            const card = document.createElement('div');
+            card.className = 'card bg-white p-6 rounded-lg shadow-md hover:bg-amber-100 flex flex-col items-center text-center';
+            card.innerHTML = `
+                <h4 class="text-lg font-semibold mb-2">${category}</h4>
+                <p class="text-sm text-stone-600">${problemsData[category].length} Problems</p>
+            `;
+            card.addEventListener('click', () => {
+                showProblemsByCategory(category);
+            });
+            homepageEl.appendChild(card);
+        });
+    }
+
+    function showHomepage() {
+        homepageEl.classList.remove('hidden');
+        problemListPageEl.classList.add('hidden');
+        solutionPageEl.classList.add('hidden');
+    }
+
+    function showProblemsByCategory(category) {
+        currentCategory = category;
+        categoryTitleEl.textContent = category;
+        problemListEl.innerHTML = '';
+        problemsData[category].forEach(problem => {
+            const problemCard = document.createElement('div');
+            problemCard.className = 'card bg-white p-4 rounded-lg shadow-md hover:bg-stone-100 flex items-center space-x-4';
+            problemCard.innerHTML = `
+                <div class="bg-amber-400 text-stone-900 font-bold w-10 h-10 flex items-center justify-center rounded-full text-md">${problem.id}</div>
+                <div class="text-left">
+                    <h5 class="font-semibold">${problem.title}</h5>
+                    <p class="text-sm text-stone-600">${problem.description}</p>
+                </div>
+            `;
+            problemCard.addEventListener('click', () => {
+                showSolutionPage(problem.id);
+            });
+            problemListEl.appendChild(problemCard);
+        });
+
+        homepageEl.classList.add('hidden');
+        problemListPageEl.classList.remove('hidden');
+        solutionPageEl.classList.add('hidden');
+    }
+
+    function showSolutionPage(problemId) {
+        let problem = null;
+        for (const category in problemsData) {
+            problem = problemsData[category].find(p => p.id === problemId);
+            if (problem) break;
+        }
+        if (!problem) return;
+
+        titleEl.textContent = `Problem ${problem.id}: ${problem.title}`;
+        descriptionEl.textContent = problem.description;
+        codeEl.textContent = problem.code;
+        
+        outputContainer.classList.add('hidden');
+        outputEl.textContent = '';
+
+        homepageEl.classList.add('hidden');
+        problemListPageEl.classList.add('hidden');
+        solutionPageEl.classList.remove('hidden');
+    }
+
+    function handleRunCode() {
+        const problemId = parseInt(titleEl.textContent.match(/Problem (\d+)/)[1]);
+        let problem = null;
+        for (const category in problemsData) {
+            problem = problemsData[category].find(p => p.id === problemId);
+            if (problem) break;
+        }
+        if (problem) {
+            outputEl.textContent = problem.output;
+            outputContainer.classList.remove('hidden');
+        }
+    }
+
+    function handleCopyCode() {
+        const problemId = parseInt(titleEl.textContent.match(/Problem (\d+)/)[1]);
+        let problem = null;
+        for (const category in problemsData) {
+            problem = problemsData[category].find(p => p.id === problemId);
+            if (problem) break;
+        }
+        if(problem && navigator.clipboard) {
+            navigator.clipboard.writeText(problem.code).then(() => {
+                copyButton.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyButton.textContent = 'Copy Code';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    }
+    
+    function init() {
+        renderCategoryCards();
+        backToCategoriesButton.addEventListener('click', showHomepage);
+        backToListButton.addEventListener('click', () => showProblemsByCategory(currentCategory));
+        runButton.addEventListener('click', handleRunCode);
+        copyButton.addEventListener('click', handleCopyCode);
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
